@@ -174,6 +174,11 @@ class Scalable {
 
 		this._scaleArea[method]('mouseenter', this._handleMouseUp);
 		this._scaleArea[method]('mouseleave', this._handleMouseUp);
+
+		if(method == 'removeEventListener') {
+			this._wrappedElement.style.pointerEvents = 'all';
+			this._scaleArea.style.cursor = 'auto';
+		}
 	}
 
 	_handleModeChangeClick() {

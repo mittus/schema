@@ -101,7 +101,7 @@ class HallSchemaView {
 
 			/* для двойных мест */
 			if(seat.group_id) {
-				if(!selectedSeats.has(seat.id) && selectedSeats.size >= this._limit - 1) {
+				if(!selectedSeats.has(seat.id) && selectedSeats.size >= this._limit - 1 && !seat.occupied) {
 					this._context.fillStyle = '#cccccc'; // При достижении лимита
 				}
 				seats.forEach((find) => {
