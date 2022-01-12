@@ -16,7 +16,7 @@ class HallSchemaService {
 			xhr.onerror = function() {
 				reject('Error while getting XML.');
 			}
-			xhr.open('GET', `/performance2.php?get_performance=${schemeId}`);
+			xhr.open('GET', `/performance.json?get_performance=${schemeId}`);
 			xhr.responseType = 'json';
 			xhr.send();
 		});
