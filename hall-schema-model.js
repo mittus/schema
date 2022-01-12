@@ -140,7 +140,8 @@ class HallSchemaModel {
 				: !isMouseInsideWorkspace
 			)
 		) {
-			this._selectOrUnselectSeatsUnderSelection();
+			// this._selectOrUnselectSeatsUnderSelection();
+			this._selectOrUnselectSeat();
 		}
 
 		this._notify();
@@ -171,14 +172,25 @@ class HallSchemaModel {
 	}
 
 	_handleMouseUp() {
+		console.log(this._seatsToSelect);
 		if (this._seatsToSelect.size) {
 			this._seatsToSelect.forEach((seatId) => {
-				this._selectedSeats.add(seatId);
+				var infoset = this._seats.find((seat) => (seat.id === seatId));
+				if(infoset.placeState === 'occupied' || infoset.placeState === 'sold' || infoset.placeState === 'inorder'){
+
+				} else {
+				    // addTicket(infoset.id+'|'+infoset.row+'|'+infoset.title+'|'+infoset.price);
+				    this._selectedSeats.add(seatId);
+				    console.log('add '+seatId);
+				}
 			});
 			this._seatsToSelect.clear();
 		} else if (this._seatsToUnselect.size) {
 			this._seatsToUnselect.forEach((seatId) => {
+				var infoset = this.seats.find((seat) => (seat.id === seatId));
+				// delTicket(infoset.id+'|'+infoset.row+'|'+infoset.title+'|'+infoset.row);
 				this._selectedSeats.delete(seatId);
+				console.log('remove '+seatId);
 			});
 			this._seatsToUnselect.clear();
 		} else {
@@ -212,6 +224,28 @@ class HallSchemaModel {
 		)
 	}
 
+	_checkHasIntersection(seat) {
+		if(this._selectStart.x === this.cursor.x && this._selectStart.y === this.cursor.y) {
+			console.log(this.cursor.x);
+			return getHasIntersection(
+				{
+					x1: seat.x,
+					y1: seat.y,
+					x2: seat.x + this._sizes.seatWidth,
+					y2: seat.y + this._sizes.seatHeight,
+				},
+				getNormalizedRect({
+					x1: this._selectStart.x,
+					y1: this._selectStart.y,
+					x2: this.cursor.x,
+					y2: this.cursor.y,
+				})
+			)
+		}
+
+	}
+
+
 	_selectOrUnselectSeatsUnderSelection() {
 		const {unselect} = HallSchemaModel.selectionModes;
 		let field = '_seatsToSelect';
@@ -223,6 +257,28 @@ class HallSchemaModel {
 			if (this._checkHasIntersectionWithSelection(seat)) {
 				this[field].add(seat.id);
 			} else this[field].delete(seat.id);
+		});
+	}
+
+	_selectOrUnselectSeat() {
+		const {unselect} = HallSchemaModel.selectionModes;
+		let field = '_seatsToSelect';
+		if (this._mode === unselect) {
+			field = '_seatsToUnselect';
+		}
+
+		this.seats.forEach((seat) => {
+			if (this._checkHasIntersection(seat)) {
+				if(seat.double) {
+					this.seats.forEach((find) => {
+						if(find.group_id == seat.group_id) {
+							this[field].add(find.id);
+						}
+					});
+				} else {
+					this[field].add(seat.id);
+				}
+			}
 		});
 	}
 

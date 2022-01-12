@@ -27,8 +27,8 @@ class Scalable {
 				align-items: center;
 				justify-content: center;
 				border-radius: 50%;
-				width: 50px;
-				height: 50px;
+				width: 40px;
+				height: 40px;
 				background-color: white;
 				border: 1px solid #cecece;
 				outline: none;
@@ -41,6 +41,9 @@ class Scalable {
 			}
 			.scalable__control:disabled {
 				background-color: #cecece;
+			}
+			.scalable__control:first-child {
+				margin-bottom: 12px;
 			}
 			.scalable__mode-button {
 				width: 40px;
@@ -55,7 +58,7 @@ class Scalable {
 		this._wrappedElement = wrappedElement;
 		this._handlePlusClick = this._handlePlusClick.bind(this);
 		this._handleMinusClick = this._handleMinusClick.bind(this);
-		this._handleModeChangeClick = this._handleModeChangeClick.bind(this);
+		// this._handleModeChangeClick = this._handleModeChangeClick.bind(this);
 		this._handleMouseMove = this._handleMouseMove.bind(this);
 		this._handleMouseDown = this._handleMouseDown.bind(this);
 		this._handleMouseUp = this._handleMouseUp.bind(this);
@@ -63,7 +66,7 @@ class Scalable {
 		this._initScaleWrapper();
 
 		this._step = 0.2;
-		this._minZoom = 0.6;
+		this._minZoom = 1;
 		this._maxZoom = 3;
 		this._zoom = 1;
 		this._offset = {x: 0, y: 0};
@@ -73,7 +76,7 @@ class Scalable {
 
 		this._plusButton.addEventListener('click', this._handlePlusClick);
 		this._minusButton.addEventListener('click', this._handleMinusClick);
-		this._modeButton.addEventListener('click', this._handleModeChangeClick);
+		// this._modeButton.addEventListener('click', this._handleModeChangeClick);
 
 		this._handleStateChange();
 	}
@@ -89,7 +92,7 @@ class Scalable {
 		this._controlsContainer.classList.add('scalable__controls-container');
 
 		this._initPlusButtonElement();
-		this._initModeButtonElement();
+		// this._initModeButtonElement();
 		this._initMinusButtonElement();
 
 		this._scaleWrapper.insertAdjacentHTML('afterbegin', `<style>${Scalable.styles}</style>`)
@@ -111,13 +114,18 @@ class Scalable {
 		this._controlsContainer.append(this._minusButton);
 	}
 
-	_initModeButtonElement() {
-		this._modeButton = document.createElement('button');
-		this._modeButton.classList.add('scalable__control', 'scalable__mode-button');
-		this._controlsContainer.append(this._modeButton);
-	}
+	// _initModeButtonElement() {
+	// 	this._modeButton = document.createElement('button');
+	// 	this._modeButton.classList.add('scalable__control', 'scalable__mode-button');
+	// 	this._controlsContainer.append(this._modeButton);
+	// }
 
 	_handlePlusClick() {
+		const {move, interact} = Scalable.modes;
+		if (this._mode === interact) {
+			this._mode = move;
+			this._manageListenersOnScaleArea('addEventListener');
+		}
 		this._zoom += this._step;
 		if (this._zoom > this._maxZoom) this._zoom = this._maxZoom;
 		if (this._zoom <= 1) this._offset = {x: 0, y: 0};
@@ -125,9 +133,16 @@ class Scalable {
 	}
 
 	_handleMinusClick() {
+		const {move, interact} = Scalable.modes;
 		this._zoom -= this._step;
 		if (this._zoom < this._minZoom) this._zoom = this._minZoom;
-		if (this._zoom <= 1) this._offset = {x: 0, y: 0};
+		if (this._zoom <= 1) {
+			if (this._mode === move) {
+				this._mode = interact;
+				this._manageListenersOnScaleArea('removeEventListener');
+			}
+			this._offset = {x: 0, y: 0};
+		}
 		this._handleStateChange();
 	}
 
@@ -195,20 +210,21 @@ class Scalable {
 			scale(${this._zoom})
 			translate(${this._offset.x}px, ${this._offset.y}px)
 		`;
-		if (this._mode === interact) {
-			this._modeButton.innerHTML = null;
-			this._modeButton.append(makeSVGIcon('touch-app-icon'));
-			this._modeButton.setAttribute('title', 'Перейти в режим перемещения схемы зала');
-			this._wrappedElement.style.pointerEvents = 'all';
-			this._scaleArea.style.cursor = 'auto';
-		} else if (this._mode === move) {
-			this._modeButton.innerHTML = null;
-			this._modeButton.append(makeSVGIcon('pan-tool-icon'));
-			this._modeButton.setAttribute('title', 'Перейти в режим взаимодействия с местами');
-			this._wrappedElement.style.pointerEvents = 'none';
-			if (!this._isMouseDown) this._scaleArea.style.cursor = 'grab';
-			else this._scaleArea.style.cursor = 'grabbing';
-		}
+		// this._wrappedElement.style.pointerEvents = 'all';
+		// if (this._mode === interact) {
+		// 	this._modeButton.innerHTML = null;
+		// 	this._modeButton.append(makeSVGIcon('touch-app-icon'));
+		// 	this._modeButton.setAttribute('title', 'Перейти в режим перемещения схемы зала');
+		// 	this._wrappedElement.style.pointerEvents = 'all';
+		// 	this._scaleArea.style.cursor = 'auto';
+		// } else if (this._mode === move) {
+		// 	this._modeButton.innerHTML = null;
+		// 	this._modeButton.append(makeSVGIcon('pan-tool-icon'));
+		// 	this._modeButton.setAttribute('title', 'Перейти в режим взаимодействия с местами');
+		// 	this._wrappedElement.style.pointerEvents = 'none';
+		// 	if (!this._isMouseDown) this._scaleArea.style.cursor = 'grab';
+		// 	else this._scaleArea.style.cursor = 'grabbing';
+		// }
 	}
 
 	init() {

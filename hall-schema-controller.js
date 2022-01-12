@@ -121,6 +121,6 @@ class HallSchemaController {
 		this._hallSchemaView.renderScreen(sizes);
 		this._hallSchemaView.renderSeats(seats, selectedSeats, sizes);
 		this._hallSchemaView.renderRows(rows, sizes);
-		if (isMouseDown) this._hallSchemaView.renderSelection(selectStart, cursor);
+		// if (isMouseDown) this._hallSchemaView.renderSelection(selectStart, cursor);
 	}
 }

@@ -10,7 +10,11 @@ function XMLHallSchemaToJSON(hallSchema) {
 				y: +seatElement.getAttribute('Y'),
 				id: seatElement.getAttribute('id'),
 				title: seatElement.getAttribute('title'),
+				row: seatElement.getAttribute('row'),
 				color: seatElement.getAttribute('colorValue'),
+				price: seatElement.getAttribute('price'),
+				placeState: seatElement.getAttribute('placeState'),
+				type: seatElement.getAttribute('placeType'),
 			};
 			rowYSum += seat.y;
 
@@ -21,6 +25,47 @@ function XMLHallSchemaToJSON(hallSchema) {
 			title: row.getAttribute('title'),
 			y: rowYSum / row.childElementCount,
 		});
+	}
+
+	return {seats, rows};
+}
+
+function JSONHallSchema(hallSchema) {
+	const rows = [];
+	const seats = [];
+
+	hallSchema.sort((a, b) => a.row - b.row);
+
+	var rowYSum = 0;
+	var rowItem = 0;
+
+	for (const item of hallSchema) {
+
+		if(rowItem == 0 || rowYSum < item.y) {
+			rowYSum = item.y;
+			rowItem = item.row;
+			rows.push({
+				title: item.row,
+				y: rowYSum, // / row.childElementCount
+			});
+		}
+
+		const seat = {
+			x: +item.x,
+			y: +item.y,
+			id: item.id,
+			title: item.place,
+			row: item.row,
+			color: item.color,
+			price: item.price,
+			place: item.place,
+			type: item.type,
+			double: item.double,
+			available: item.available,
+			group_id: item.group_id,
+		};
+
+		seats.push(seat);
 	}
 
 	return {seats, rows};
@@ -41,7 +86,7 @@ function getHasIntersection(rect1, rect2) {
 	);
 }
 
-function makeSVGIcon(iconId, size = 24) {
+function makeSVGIcon(iconId, size = 16) {
 	const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 	svg.setAttributeNS(null, 'viewBox', '0 0 24 24');
 	svg.setAttributeNS(null, 'width', size);
