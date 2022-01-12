@@ -62,6 +62,8 @@ function JSONHallSchema(hallSchema) {
 			double: item.double,
 			available: item.available,
 			group_id: item.group_id,
+			occupied: item.occupied,
+			unactive: false,
 		};
 
 		seats.push(seat);
@@ -83,14 +85,4 @@ function getHasIntersection(rect1, rect2) {
 		((rect1.x1 - rect2.x2) * (rect1.x2 - rect2.x1) < 0)
 		&& ((rect1.y1 - rect2.y1) * (rect1.y2 - rect2.y2) < 0)
 	);
-}
-
-function makeSVGIcon(iconId, size = 16) {
-	const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-	svg.setAttributeNS(null, 'viewBox', '0 0 24 24');
-	svg.setAttributeNS(null, 'width', size);
-	svg.setAttributeNS(null, 'height', size);
-	svg.insertAdjacentHTML('afterbegin', `<use xlink:href="#${iconId}"/>`);
-
-	return svg;
 }

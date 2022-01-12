@@ -11,6 +11,7 @@ class Scalable {
 			.scalable__scale-area {
 			    flex-grow: 1;
 			    overflow: hidden;
+			    border: 1px solid #f0f0f0;
 			}
 		`;
 	}
@@ -38,28 +39,35 @@ class Scalable {
 		this._plusButton.addEventListener('click', this._handlePlusClick);
 		this._minusButton.addEventListener('click', this._handleMinusClick);
 		this._resetButton.addEventListener('click', this._handleResetClick);
-		// this._modeButton.addEventListener('click', this._handleModeChangeClick);
 
 		this._handleStateChange();
 	}
 
 	_initScaleWrapper() {
-		this._scaleWrapper = document.createElement('div');
-		this._scaleWrapper.classList.add('scalable');
+		this._hasElements = document.getElementsByClassName('scalable');
 
-		this._scaleArea = document.createElement('div');
-		this._scaleArea.classList.add('scalable__scale-area');
+		if(this._hasElements.length) {
+			this._scaleWrapper = this._hasElements[0];
+		} else {
+			this._scaleWrapper = document.createElement('div');
+			this._scaleWrapper.classList.add('scalable');
+		}
 
-		// this._controlsContainer = document.createElement('div');
-		// this._controlsContainer.classList.add('scalable__controls-container');
-		
+		if(this._hasElements.length) {
+			this._scaleArea = document.getElementsByClassName('scalable__scale-area')[0];
+		} else {
+			this._scaleArea = document.createElement('div');
+			this._scaleArea.classList.add('scalable__scale-area');
+		}
+
 		this._initPlusButtonElement();
 		this._initMinusButtonElement();
 		this._initResetButtonElement();
 
-		this._scaleWrapper.insertAdjacentHTML('afterbegin', `<style>${Scalable.styles}</style>`)
-		this._scaleWrapper.append(this._scaleArea);
-		// this._scaleWrapper.append(this._controlsContainer);
+		if(!this._hasElements.length) {
+			this._scaleWrapper.insertAdjacentHTML('afterbegin', `<style>${Scalable.styles}</style>`)
+			this._scaleWrapper.append(this._scaleArea);
+		}
 	}
 
 	_initPlusButtonElement() {
@@ -113,7 +121,7 @@ class Scalable {
 
 	_handleMouseMove(event) {
 		if (this._isMouseDown) {
-
+			event.preventDefault();
 			this._wrappedElement.style.pointerEvents = 'none';
 			this._scaleArea.style.cursor = 'move';
 			const deltaX = (event.layerX - this._lastCursorPosition.x) / this._zoom;
@@ -150,10 +158,20 @@ class Scalable {
 		this._handleStateChange();
 	}
 
+	_handleTouchMove(event) {
+		
+	}
+
 	_manageListenersOnScaleArea(method) {
+		this._scaleArea[method]('touchmove', this._handleMouseMove);
 		this._scaleArea[method]('mousemove', this._handleMouseMove);
+
+		this._scaleArea[method]('touchstart', this._handleMouseDown);
 		this._scaleArea[method]('mousedown', this._handleMouseDown);
+
+		this._scaleArea[method]('touchend', this._handleMouseUp);
 		this._scaleArea[method]('mouseup', this._handleMouseUp);
+
 		this._scaleArea[method]('mouseenter', this._handleMouseUp);
 		this._scaleArea[method]('mouseleave', this._handleMouseUp);
 	}
@@ -184,29 +202,12 @@ class Scalable {
 			scale(${this._zoom})
 			translate(${this._offset.x}px, ${this._offset.y}px)
 		`;
-		/* старый обработчик включения режима перемещения
-
-			this._wrappedElement.style.pointerEvents = 'all';
-			if (this._mode === interact) {
-				this._modeButton.innerHTML = null;
-				this._modeButton.append(makeSVGIcon('touch-app-icon'));
-				this._modeButton.setAttribute('title', 'Перейти в режим перемещения схемы зала');
-				this._wrappedElement.style.pointerEvents = 'all';
-				this._scaleArea.style.cursor = 'auto';
-			} else if (this._mode === move) {
-				this._modeButton.innerHTML = null;
-				this._modeButton.append(makeSVGIcon('pan-tool-icon'));
-				this._modeButton.setAttribute('title', 'Перейти в режим взаимодействия с местами');
-				this._wrappedElement.style.pointerEvents = 'none';
-				if (!this._isMouseDown) this._scaleArea.style.cursor = 'grab';
-				else this._scaleArea.style.cursor = 'grabbing';
-			}
-
-		*/
 	}
 
 	init() {
-		this._wrappedElement.before(this._scaleWrapper);
-		this._scaleArea.append(this._wrappedElement);
+		if(!this._hasElements.length) {
+			this._wrappedElement.before(this._scaleWrapper);
+			this._scaleArea.append(this._wrappedElement);
+		}
 	}
 }

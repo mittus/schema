@@ -18,35 +18,27 @@
     <script type="text/javascript" src="scalable.js"></script>
     <script type="text/javascript" src="hall-schema.js"></script>
 
-<div class="uk-container uk-container-expand" id="hallSettings">
+<div class="uk-container uk-container-expand">
     <script type="text/javascript">
         let hallSchema;
         let thisPerformanceId;
-
         document.addEventListener('DOMContentLoaded', () =>
             {
                 const root = document.getElementById('canvas-holder');
                 hallSchema = new HallSchema();
                 const scalable = new Scalable(root);
 
-                /*hallSchema.onFetching((isFetching) =>
-                {
-                    if (isFetching) lockControls();
-                    else unlockControls();
-                    });*/
                 hallSchema.schemeId = performanceId;
+                hallSchema._view._limit = 5;
                 thisPerformanceId = performanceId;
-                hallSchema.topScreen = 1;
-                hallSchema.monitor = false;
                 hallSchema.init(root);
                 scalable.init();
 
                 // setInterval(function(){
                 //     hallSchema.schemeId = performanceId;
-                //     }, 10000);
+                // }, 10000);
             }
         );
-
     </script>
     <div id="canvas-holder" style="width:100%; height: 100%;"></div>
     <div class="uk-text-center uk-margin-small-top">
@@ -55,6 +47,5 @@
         <a href="#" class="uk-icon-button mapControl" data-control="2" uk-icon="plus" uk-tooltip="Увеличить схему">Плюс</a>
     </div>
 </div>
-
 </body>
 </html>

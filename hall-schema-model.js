@@ -190,7 +190,8 @@ class HallSchemaModel {
 			if( seat.x <= this.cursor.x
 			&& (seat.x + this._sizes.seatWidth) >= this.cursor.x
 			&& seat.y <= this.cursor.y
-			&& (seat.y + this._sizes.seatHeight) >= this.cursor.y  ) {
+			&& (seat.y + this._sizes.seatHeight) >= this.cursor.y 
+			&& !seat.unactive) {
 				if(seat.double) {
 					this.seats.forEach((find) => {
 						if(find.group_id == seat.group_id) {
@@ -227,6 +228,7 @@ class HallSchemaModel {
 
 				} else {
 				    // addTicket(infoset.id+'|'+infoset.row+'|'+infoset.title+'|'+infoset.price);
+				    // console.log(this._selectedSeats);
 				    this._selectedSeats.add(seatId);
 				    console.log('add '+seatId);
 				}
@@ -240,17 +242,6 @@ class HallSchemaModel {
 				console.log('remove '+seatId);
 			});
 			this._seatsToUnselect.clear();
-		} else {
-			const {seatUnderCursor} = this;
-			if (seatUnderCursor) {
-				const {select, unselect} = HallSchemaModel.selectionModes;
-	
-				if (this._mode === select) {
-					this._selectedSeats.add(seatUnderCursor.id);
-				} else if (this._mode === unselect) {
-					this._selectedSeats.delete(seatUnderCursor.id);
-				}
-			}
 		}
 	}
 
@@ -293,7 +284,7 @@ class HallSchemaModel {
 		}
 
 		this.seats.forEach((seat) => {
-			if (this._checkHasIntersectionWithSelection(seat)) {
+			if (this._checkHasIntersectionWithSelection(seat) && !seat.unactive) {
 				if(seat.double) {
 					this.seats.forEach((find) => {
 						if(find.group_id == seat.group_id) {

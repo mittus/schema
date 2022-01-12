@@ -81,7 +81,6 @@ class HallSchemaController {
 				y: event.offsetY,
 			},
 		};
-		// if (this._hallSchemaModel.isMouseDown) { }
 	}
 
 	_handleMouseDown(event) {
@@ -127,6 +126,5 @@ class HallSchemaController {
 		this._hallSchemaView.renderScreen(sizes);
 		this._hallSchemaView.renderSeats(seats, selectedSeats, hoveredSeat, sizes);
 		this._hallSchemaView.renderRows(rows, sizes);
-		// if (isMouseDown) this._hallSchemaView.renderSelection(selectStart, cursor);
 	}
 }
