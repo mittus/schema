@@ -69,14 +69,19 @@ class HallSchemaController {
 	}
 
 	_handleMouseMove(event) {
-		if (this._hallSchemaModel.isMouseDown) {
-			this._hallSchemaModel.state = {
-				cursor: {
-					x: event.offsetX,
-					y: event.offsetY,
-				},
-			};
+		if(this._hallSchemaModel.hoveredSeat.length) {
+			this._canvas.style.cursor = 'pointer';
+		} else {
+			this._canvas.style.cursor = 'auto';
 		}
+		this._hallSchemaModel.state = {
+			isMouseMove: true,
+			cursor: {
+				x: event.offsetX,
+				y: event.offsetY,
+			},
+		};
+		// if (this._hallSchemaModel.isMouseDown) { }
 	}
 
 	_handleMouseDown(event) {
@@ -103,12 +108,13 @@ class HallSchemaController {
 		this._hallSchemaModel.state = {
 			isMouseInsideWorkspace: false,
 			isMouseDown: false,
+			isMouseMove: false,
 		};
 	}
 
 	_handleModelChange() {
 		const {
-			sizes, sizesWithDPR, DPR, seats, selectedSeats, rows, isMouseDown, selectStart, cursor,
+			sizes, sizesWithDPR, DPR, seats, selectedSeats, hoveredSeat, rows, isMouseDown, isMouseMove, selectStart, cursor,
 		} = this._hallSchemaModel;
 
 		if (!seats.length) return;
@@ -119,7 +125,7 @@ class HallSchemaController {
 		this._context.clearRect(0, 0, sizesWithDPR.canvasWidth, sizesWithDPR.canvasHeight);
 
 		this._hallSchemaView.renderScreen(sizes);
-		this._hallSchemaView.renderSeats(seats, selectedSeats, sizes);
+		this._hallSchemaView.renderSeats(seats, selectedSeats, hoveredSeat, sizes);
 		this._hallSchemaView.renderRows(rows, sizes);
 		// if (isMouseDown) this._hallSchemaView.renderSelection(selectStart, cursor);
 	}

@@ -36,17 +36,16 @@ function JSONHallSchema(hallSchema) {
 
 	hallSchema.sort((a, b) => a.row - b.row);
 
-	var rowYSum = 0;
-	var rowItem = 0;
+	let rowYSum = 0;
 
-	for (const item of hallSchema) {
+	for (const [i, item] of hallSchema.entries()) {
 
-		if(rowItem == 0 || rowYSum < item.y) {
+		if(i == 0 || rowYSum < item.y) {
 			rowYSum = item.y;
 			rowItem = item.row;
 			rows.push({
 				title: item.row,
-				y: rowYSum, // / row.childElementCount
+				y: rowYSum,
 			});
 		}
 

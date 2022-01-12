@@ -11,17 +11,18 @@ class HallSchemaModel {
 		this._weakMemo = new WeakMap();
 
 		this._sizes = {
-			seatWidth: 40,
-			seatHeight: 40,
-			rowWidth: 40,
-			screenHeight: 50,
-			screenMargin: 50,
+			seatWidth: 80,
+			seatHeight: 80,
+			rowWidth: 60,
+			screenHeight: 100,
+			screenMargin: 80,
 			canvasWidth: 0,
 			canvasHeight: 0,
 		};
 		this._DPR = window.devicePixelRatio || 1;
 
 		this._seats = [];
+		this._hoveredSeat = [];
 		this._selectedSeats = new Set();
 		this._seatsToSelect = new Set();
 		this._seatsToUnselect = new Set();
@@ -32,6 +33,7 @@ class HallSchemaModel {
 		this._selectStart = {x: 0, y: 0};
 
 		this._isMouseDown = false;
+		this._isMouseMove = false;
 		this._mode = HallSchemaModel.selectionModes.select;
 	}
 
@@ -51,7 +53,12 @@ class HallSchemaModel {
 			]);
 		}
 
+
 		return selectedSeats;
+	}
+	get hoveredSeat() {
+		let hoveredSeat = this._hoveredSeat;
+		return hoveredSeat;
 	}
 	get cursor() {
 		return {
@@ -85,6 +92,7 @@ class HallSchemaModel {
 		}));
 	}
 	get isMouseDown() { return this._isMouseDown; }
+	get isMouseMove() { return this._isMouseMove; }
 	get selectStart() { return this._selectStart; }
 	get seatUnderCursor() {
 		return this.seats.find((seat) => (
@@ -108,10 +116,12 @@ class HallSchemaModel {
 		cursor,
 		proportion,
 		isMouseDown,
+		isMouseMove,
 		isMouseInsideWorkspace,
 	}) {
 		if (seats) {
 			this._seats = seats;
+			this._hoveredSeat = [];
 			this._selectedSeats = new Set();
 			this._seatsToSelect = new Set();
 			this._seatsToUnselect = new Set();
@@ -124,24 +134,40 @@ class HallSchemaModel {
 		if (proportion) this._proportion = proportion;
 		if (cursor) this._changeCursor(cursor);
 		if (typeof isMouseDown === 'boolean') {
-			this._isMouseDown = isMouseDown;
+			// this._isMouseDown = isMouseDown;
 			if (isMouseDown) {
 				this._selectStart = this.cursor;
 				this._setMode();
 			} else if (typeof isMouseInsideWorkspace === 'boolean'
 				? isMouseInsideWorkspace
 				: !isMouseInsideWorkspace
-			) this._handleMouseUp();
+			) {
+				if(this._selectStart.x === this.cursor.x 
+					&& this._selectStart.y === this.cursor.y) {
+					this._selectOrUnselectSeat();
+					this._handleMouseUp();
+				}
+			}
+			/* if (isMouseDown) {
+				this._selectStart = this.cursor;
+				this._setMode();
+			} else if (typeof isMouseInsideWorkspace === 'boolean'
+				? isMouseInsideWorkspace
+				: !isMouseInsideWorkspace
+			) this._handleMouseUp(); */
 		};
-		if (
+		/* if (
 			this._isMouseDown && cursor
 			&& (typeof isMouseInsideWorkspace === 'boolean'
 				? isMouseInsideWorkspace
 				: !isMouseInsideWorkspace
 			)
 		) {
-			// this._selectOrUnselectSeatsUnderSelection();
+			this._selectOrUnselectSeatsUnderSelection();
 			this._selectOrUnselectSeat();
+		} */
+		if (isMouseMove) {
+			this._hoverMode();
 		}
 
 		this._notify();
@@ -158,6 +184,28 @@ class HallSchemaModel {
 		} else this._mode = HallSchemaModel.selectionModes.select;
 	}
 
+	_hoverMode() {
+		let findedSeats = [];
+		this.seats.forEach((seat) => {
+			if( seat.x <= this.cursor.x
+			&& (seat.x + this._sizes.seatWidth) >= this.cursor.x
+			&& seat.y <= this.cursor.y
+			&& (seat.y + this._sizes.seatHeight) >= this.cursor.y  ) {
+				if(seat.double) {
+					this.seats.forEach((find) => {
+						if(find.group_id == seat.group_id) {
+							findedSeats.push(find.id);
+						}
+					});
+				} else {
+					findedSeats.push(seat.id);
+				}
+			}
+		});
+
+		this._hoveredSeat = findedSeats;
+	}
+
 	_calculateCanvasSizes() {
 		const canvasSizes = this._seats.reduce((accumulator, seat) => {
 			accumulator.canvasWidth = Math.max(accumulator.canvasWidth, seat.x + this._sizes.seatWidth);
@@ -172,7 +220,6 @@ class HallSchemaModel {
 	}
 
 	_handleMouseUp() {
-		console.log(this._seatsToSelect);
 		if (this._seatsToSelect.size) {
 			this._seatsToSelect.forEach((seatId) => {
 				var infoset = this._seats.find((seat) => (seat.id === seatId));
@@ -224,28 +271,6 @@ class HallSchemaModel {
 		)
 	}
 
-	_checkHasIntersection(seat) {
-		if(this._selectStart.x === this.cursor.x && this._selectStart.y === this.cursor.y) {
-			console.log(this.cursor.x);
-			return getHasIntersection(
-				{
-					x1: seat.x,
-					y1: seat.y,
-					x2: seat.x + this._sizes.seatWidth,
-					y2: seat.y + this._sizes.seatHeight,
-				},
-				getNormalizedRect({
-					x1: this._selectStart.x,
-					y1: this._selectStart.y,
-					x2: this.cursor.x,
-					y2: this.cursor.y,
-				})
-			)
-		}
-
-	}
-
-
 	_selectOrUnselectSeatsUnderSelection() {
 		const {unselect} = HallSchemaModel.selectionModes;
 		let field = '_seatsToSelect';
@@ -268,7 +293,7 @@ class HallSchemaModel {
 		}
 
 		this.seats.forEach((seat) => {
-			if (this._checkHasIntersection(seat)) {
+			if (this._checkHasIntersectionWithSelection(seat)) {
 				if(seat.double) {
 					this.seats.forEach((find) => {
 						if(find.group_id == seat.group_id) {

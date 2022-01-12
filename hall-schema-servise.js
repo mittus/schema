@@ -7,6 +7,7 @@ class HallSchemaService {
 				/*
 				const parser = new DOMParser();
 				const xml = parser.parseFromString(xhr.responseText, 'application/xml');
+
 				resolve(XMLHallSchemaToJSON(
 					xml.documentElement.getElementsByTagName('places')[0]
 				));
@@ -15,7 +16,7 @@ class HallSchemaService {
 			xhr.onerror = function() {
 				reject('Error while getting XML.');
 			}
-			xhr.open('GET', `performance2.php?get_performance=${schemeId}`);
+			xhr.open('GET', `/performance2.php?get_performance=${schemeId}`);
 			xhr.responseType = 'json';
 			xhr.send();
 		});
