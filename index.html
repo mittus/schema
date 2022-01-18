@@ -31,19 +31,37 @@
 <div class="uk-container uk-container-expand">
     <script type="text/javascript">
         $(function() {
+            let params = (new URL(document.location)).searchParams; 
+            let val = params.get('id');
+            if(val !== null) {
+                findSchema(val);
+                $('[name=performance]').val(val);
+            }
+
             $('#change_performance').submit(function(e) {
                 e.preventDefault();
-                const val = $(this).serializeArray()[0].value;
-
-                if(hallSchema) {
-                    console.log('Обновление схемы');
-                    hallSchema.schemeId = val;
-                } else {
-                    console.log('Новая схема');
-                    initSchema(val);
-                } 
+                val = $(this).serializeArray()[0].value;
+                history.pushState(null, null, '?id='+val);
+                findSchema(val);
             });
+            $('a').click(function(e) {
+                e.preventDefault();
+            });
+            $('#showSeats').click(function() {
+                hallSchema._view._names = true;
+                findSchema(val);
+            })
         });
+
+        var findSchema = function(id) {
+            if(hallSchema) {
+                console.log('Обновление схемы');
+                hallSchema.schemeId = id;
+            } else {
+                console.log('Новая схема');
+                initSchema(id);
+            }
+        }
 
         var seatImages = {
             'standart': new Image(),
@@ -54,11 +72,11 @@
         };
 
 
-        seatImages.standart.src = '/img/seats/standart.png';
-        seatImages.comfort.src = '/img/seats/comfort.png';
-        seatImages.massage.src = '/img/seats/massage.png';
-        seatImages.sofa.src = '/img/seats/sofa.png';
-        seatImages.bed.src = '/img/seats/bed.png';
+        seatImages.standart.src = 'img/seats/standart.png';
+        seatImages.comfort.src = 'img/seats/comfort.png';
+        seatImages.massage.src = 'img/seats/massage.png';
+        seatImages.sofa.src = 'img/seats/sofa.png';
+        seatImages.bed.src = 'img/seats/bed.png';
 
         /*var images = [
             '/img/seats/standart.png',
@@ -76,7 +94,6 @@
         });*/
 
         let hallSchema;
-        let thisPerformanceId;
 
         var initSchema = function(id) {
 
@@ -87,7 +104,6 @@
             hallSchema.schemeId = id;
             hallSchema._view._limit = 5;
             hallSchema._view._images = seatImages;
-            thisPerformanceId = id;
             hallSchema.init(root);
             scalable.init();
 
@@ -99,10 +115,24 @@
 
     </script>
     <div id="canvas-holder" style="width:100%; height: 100%;"></div>
-    <div class="uk-text-center uk-margin-small-top">
-        <a href="#" class="uk-icon-button mapControl" data-control="0" uk-icon="minus" uk-tooltip="Уменьшить схему">Минус</a>
-        <a href="#" class="uk-icon-button mapControl" data-control="1" uk-icon="thumbnails" uk-tooltip="Вернуть в исходный вид">Сброс</a>
-        <a href="#" class="uk-icon-button mapControl" data-control="2" uk-icon="plus" uk-tooltip="Увеличить схему">Плюс</a>
+    <div style="margin-top: 20px;">
+        <button data-control="0" uk-icon="minus" uk-tooltip="Уменьшить схему">-</button>
+        <button data-control="1" uk-icon="thumbnails" uk-tooltip="Вернуть в исходный вид">=</button>
+        <button data-control="2" uk-icon="plus" uk-tooltip="Увеличить схему">+</button>
+        <button id="showSeats">Номера мест</button>
+        <!-- <button id="showLegend">Показать легенду</button> -->
+    </div>
+    <div>
+        <p>Examples</p>
+        <ul>
+            <li>61dbebfb37141200011c0c53</li>
+            <li>61dbeb7637141200011c0ab5</li>
+            <li>61dbec2037141200011c0cbe</li>
+            <li>61dbebb837141200011c0b3a</li>
+            <li>61dbee3a37141200011c1596</li>
+            <li>61dbebe937141200011c0c00</li>
+            <li>61dbede137141200011c1445</li>
+        </ul>
     </div>
 </div>
 </body>

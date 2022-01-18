@@ -126,5 +126,6 @@ class HallSchemaController {
 		this._hallSchemaView.renderScreen(sizes);
 		this._hallSchemaView.renderSeats(seats, selectedSeats, hoveredSeat, sizes);
 		this._hallSchemaView.renderRows(rows, sizes);
+		this._hallSchemaView.renderLegend(sizes);
 	}
 }

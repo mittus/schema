@@ -1,7 +1,8 @@
 class HallSchemaView {
 	constructor() {
 		this._context = null;
-		this._limit = 1;
+		this._limit = false;
+		this._limit = false;
 	}
 
 	set context(context) {
@@ -35,6 +36,21 @@ class HallSchemaView {
 		this._context.fillText('ЭКРАН', sizes.canvasWidth / 2, sizes.screenHeight);
 	}
 
+	renderLegend(sizes) {
+		// console.log(sizes)
+		this._context.textBaseline = 'middle';
+		this._context.textAlign = 'center';
+		this._context.fillStyle = 'rgba(0, 0, 0, 0.4)';
+		this._context.font = '20px sans-serif';
+
+		// this._context.stroke(new Path2D(`
+		// 	M ${sizes.rowWidth} ${sizes.screenHeight}
+		// 	Q ${sizes.canvasWidth / 2} 0 ${sizes.canvasWidth - sizes.rowWidth} ${sizes.screenHeight}
+		// `));
+
+		this._context.fillText('Легенда с описанием и назначением мест', sizes.canvasWidth / 2, sizes.canvasHeight - sizes.legendMargin);
+	}
+
 	renderSeats(
 		seats = [],
 		selectedSeats = new Set(),
@@ -59,7 +75,7 @@ class HallSchemaView {
 			} 
 			if (selectedSeats.has(seat.id)) {
 				color = '#80dd4c'; // Выбранный
-			} else if(selectedSeats.size >= this._limit) { // При достижении лимита
+			} else if(this._limit && selectedSeats.size >= this._limit) { // При достижении лимита
 				color = '#cccccc';
 			} else if(hoveredSeat.includes(seat.id)) {
 				color = shadeColor(color, -5) // При наведении
@@ -88,7 +104,7 @@ class HallSchemaView {
 
 			/* для двойных мест */
 			if(seat.group_id) {
-				if(!selectedSeats.has(seat.id) && selectedSeats.size >= this._limit - 1 && !seat.occupied) {
+				if(!selectedSeats.has(seat.id) && this._limit && selectedSeats.size >= this._limit - 1 && !seat.occupied) {
 					color = '#cccccc'; // При достижении лимита
 				}
 				seats.forEach((find) => {
@@ -119,6 +135,16 @@ class HallSchemaView {
 			if(color == '#cccccc' || color == '#fc8a66') {
 				seat.unactive = true;
 			} else seat.unactive = false;
+
+
+			if(this._names) {
+				this._context.textBaseline = 'top';
+				this._context.textAlign = 'center';
+				this._context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+				this._context.font = '15px sans-serif';
+				this._context.fillText(seat.title, left + sizes.seatWidth/2, top + sizes.seatHeight - padding);
+			}
+
 		});
 	}
 }

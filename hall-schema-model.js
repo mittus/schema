@@ -13,9 +13,11 @@ class HallSchemaModel {
 		this._sizes = {
 			seatWidth: 80,
 			seatHeight: 80,
-			rowWidth: 60,
+			rowWidth: 50,
 			screenHeight: 100,
 			screenMargin: 80,
+			legendHeight: 60,
+			legendMargin: 20,
 			canvasWidth: 0,
 			canvasHeight: 0,
 		};
@@ -210,7 +212,7 @@ class HallSchemaModel {
 	_calculateCanvasSizes() {
 		const canvasSizes = this._seats.reduce((accumulator, seat) => {
 			accumulator.canvasWidth = Math.max(accumulator.canvasWidth, seat.x + this._sizes.seatWidth);
-			accumulator.canvasHeight = Math.max(accumulator.canvasHeight, seat.y + this._sizes.seatHeight);
+			accumulator.canvasHeight = Math.max(accumulator.canvasHeight, seat.y + this._sizes.seatHeight + this._sizes.legendHeight);
 
 			return accumulator;
 		}, {canvasWidth: 0, canvasHeight: 0});
