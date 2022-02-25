@@ -2,7 +2,6 @@ class HallSchemaView {
 	constructor() {
 		this._context = null;
 		this._limit = false;
-		this._limit = false;
 	}
 
 	set context(context) {
@@ -36,8 +35,8 @@ class HallSchemaView {
 		this._context.fillText('ЭКРАН', sizes.canvasWidth / 2, sizes.screenHeight);
 	}
 
-	renderLegend(sizes) {
-		// console.log(sizes)
+	renderLegend(sizes, legend = []) {
+		// console.log(legend)
 		this._context.textBaseline = 'middle';
 		this._context.textAlign = 'center';
 		this._context.fillStyle = 'rgba(0, 0, 0, 0.4)';
@@ -48,7 +47,7 @@ class HallSchemaView {
 		// 	Q ${sizes.canvasWidth / 2} 0 ${sizes.canvasWidth - sizes.rowWidth} ${sizes.screenHeight}
 		// `));
 
-		this._context.fillText('Легенда с описанием и назначением мест', sizes.canvasWidth / 2, sizes.canvasHeight - sizes.legendMargin);
+		this._context.fillText(legend, sizes.canvasWidth / 2, sizes.canvasHeight - sizes.legendMargin);
 	}
 
 	renderSeats(
@@ -138,11 +137,26 @@ class HallSchemaView {
 
 
 			if(this._names) {
+				if(!seat.color) {
+					seat.color = '#eeeeee';
+				}
+
+				this._context.beginPath();
+				this._context.arc(left + sizes.seatWidth/2, top-2, 12, 0, Math.PI * 2);
+				this._context.closePath();
+				this._context.fillStyle = seat.color;
+				this._context.fill();
+				this._context.lineWidth = 1;
+				this._context.strokeStyle = shadeColor(seat.color, -20);
+				this._context.stroke();
+
+
 				this._context.textBaseline = 'top';
 				this._context.textAlign = 'center';
-				this._context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+				this._context.fillStyle = shadeColor(seat.color, -50);
 				this._context.font = '15px sans-serif';
-				this._context.fillText(seat.title, left + sizes.seatWidth/2, top + sizes.seatHeight - padding);
+				this._context.fillText(seat.title, left + sizes.seatWidth/2, top - 8);
+
 			}
 
 		});

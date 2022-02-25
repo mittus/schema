@@ -48,7 +48,8 @@
                 e.preventDefault();
             });
             $('#showSeats').click(function() {
-                hallSchema._view._names = true;
+                hallSchema._model._extended = true; // Выбор ряда целиком
+                hallSchema._view._names = true; // Отображение номеров мест
                 findSchema(val);
             })
         });

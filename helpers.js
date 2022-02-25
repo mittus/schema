@@ -1,3 +1,5 @@
+/* 
+
 function XMLHallSchemaToJSON(hallSchema) {
 	const rows = [];
 	const seats = [];
@@ -30,9 +32,12 @@ function XMLHallSchemaToJSON(hallSchema) {
 	return {seats, rows};
 }
 
+*/
+
 function JSONHallSchema(hallSchema) {
 	const rows = [];
 	const seats = [];
+	const legend = [];
 
 	hallSchema.sort((a, b) => a.row - b.row);
 
@@ -69,7 +74,14 @@ function JSONHallSchema(hallSchema) {
 		seats.push(seat);
 	}
 
-	return {seats, rows};
+	const test = {
+		name: 'test value',
+		id: 'test id',
+	}
+
+	legend.push(test);
+
+	return {seats, rows, legend};
 }
 
 function getNormalizedRect(rect) {

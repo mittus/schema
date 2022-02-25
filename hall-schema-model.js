@@ -30,6 +30,8 @@ class HallSchemaModel {
 		this._seatsToUnselect = new Set();
 		this._rows = [];
 
+		this._legend = [];
+
 		this._cursor = {x: 0, y: 0};
 		this._proportion = {vertical: 1, horizontal: 1};
 		this._selectStart = {x: 0, y: 0};
@@ -37,6 +39,7 @@ class HallSchemaModel {
 		this._isMouseDown = false;
 		this._isMouseMove = false;
 		this._mode = HallSchemaModel.selectionModes.select;
+		this._extended = false;
 	}
 
 	get selectedSeats() {
@@ -88,11 +91,13 @@ class HallSchemaModel {
 		return this._weakMemo.get(this._seats)
 	}
 	get rows() {
+		// console.log(this._rows)
 		return this._rows.map((row) => ({
 			...row,
 			y: row.y + this.offset.y,
 		}));
 	}
+	get legend() { return this._legend; };
 	get isMouseDown() { return this._isMouseDown; }
 	get isMouseMove() { return this._isMouseMove; }
 	get selectStart() { return this._selectStart; }
@@ -104,6 +109,14 @@ class HallSchemaModel {
 			&& (seat.y + this._sizes.seatHeight) >= this.cursor.y
 		));
 	}
+	/*get rowUnderCursor() {
+		return this.rows.find((row) => (
+			row.y <= this.cursor.y 
+			&& (row.y + this._sizes.seatHeight) >= this.cursor.y
+			&& ( this.cursor.x <= this._sizes.rowWidth
+			|| this.cursor.x >= (this.sizes.canvasWidth - this._sizes.rowWidth)) 
+		));
+	}*/
 	get offset() {
 		return {
 			x: this._sizes.rowWidth,
@@ -181,30 +194,52 @@ class HallSchemaModel {
 
 	_setMode() {
 		const {seatUnderCursor} = this;
+		// const {rowUnderCursor} = this;
 		if (seatUnderCursor && this._selectedSeats.has(seatUnderCursor.id)) {
 			this._mode = HallSchemaModel.selectionModes.unselect;
 		} else this._mode = HallSchemaModel.selectionModes.select;
 	}
 
 	_hoverMode() {
-		let findedSeats = [];
-		this.seats.forEach((seat) => {
-			if( seat.x <= this.cursor.x
-			&& (seat.x + this._sizes.seatWidth) >= this.cursor.x
-			&& seat.y <= this.cursor.y
-			&& (seat.y + this._sizes.seatHeight) >= this.cursor.y 
-			&& !seat.unactive) {
-				if(seat.double) {
-					this.seats.forEach((find) => {
-						if(find.group_id == seat.group_id) {
-							findedSeats.push(find.id);
+		let findedSeats = [],
+			rowsSelected;
+
+		if(this._extended === true) {
+			this.rows.forEach((row) => {
+				if( row.y <= this.cursor.y 
+				&& (row.y + this._sizes.seatHeight) >= this.cursor.y
+				&& ( this.cursor.x <= this._sizes.rowWidth
+				|| this.cursor.x >= (this.sizes.canvasWidth - this._sizes.rowWidth)) ) {
+					this.seats.forEach((seat) => {
+						if( seat.y <= this.cursor.y
+						&& (seat.y + this._sizes.seatHeight) >= this.cursor.y) {
+							findedSeats.push(seat.id);
+							rowsSelected = true;
 						}
 					});
-				} else {
-					findedSeats.push(seat.id);
 				}
-			}
-		});
+			});
+		}
+
+		if(!rowsSelected) {
+			this.seats.forEach((seat) => {
+				if( seat.x <= this.cursor.x
+				&& (seat.x + this._sizes.seatWidth) >= this.cursor.x
+				&& seat.y <= this.cursor.y
+				&& (seat.y + this._sizes.seatHeight) >= this.cursor.y 
+				&& !seat.unactive) {
+					if(seat.double) {
+						this.seats.forEach((find) => {
+							if(find.group_id == seat.group_id) {
+								findedSeats.push(find.id);
+							}
+						});
+					} else {
+						findedSeats.push(seat.id);
+					}
+				}
+			});
+		}
 
 		this._hoveredSeat = findedSeats;
 	}
@@ -264,7 +299,7 @@ class HallSchemaModel {
 		)
 	}
 
-	_selectOrUnselectSeatsUnderSelection() {
+	/*_selectOrUnselectSeatsUnderSelection() {
 		const {unselect} = HallSchemaModel.selectionModes;
 		let field = '_seatsToSelect';
 		if (this._mode === unselect) {
@@ -276,7 +311,7 @@ class HallSchemaModel {
 				this[field].add(seat.id);
 			} else this[field].delete(seat.id);
 		});
-	}
+	}*/
 
 	_selectOrUnselectSeat() {
 		const {unselect} = HallSchemaModel.selectionModes;
@@ -285,7 +320,11 @@ class HallSchemaModel {
 			field = '_seatsToUnselect';
 		}
 
-		this.seats.forEach((seat) => {
+		this._hoveredSeat.forEach((seatId) => {
+			this[field].add(seatId);
+		});
+
+		/*this.seats.forEach((seat) => {
 			if (this._checkHasIntersectionWithSelection(seat) && !seat.unactive) {
 				if(seat.double) {
 					this.seats.forEach((find) => {
@@ -297,7 +336,7 @@ class HallSchemaModel {
 					this[field].add(seat.id);
 				}
 			}
-		});
+		});*/
 	}
 
 	_notify() {

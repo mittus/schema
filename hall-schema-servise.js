@@ -16,7 +16,8 @@ class HallSchemaService {
 			xhr.onerror = function() {
 				reject('Error while getting XML.');
 			}
-			xhr.open('GET', 'https://pay.lumenfilm.ru/api/kinokassa/?get_performance='+schemeId);
+			// xhr.open('GET', 'https://pay.lumenfilm.ru/api/kinokassa/?get_performance='+schemeId);
+			xhr.open('GET', 'https://pay.lumenfilm.ru/api/systemakino/?get_performance='+schemeId);
 			xhr.responseType = 'json';
 			xhr.send();
 		});

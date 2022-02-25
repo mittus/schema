@@ -113,7 +113,7 @@ class HallSchemaController {
 
 	_handleModelChange() {
 		const {
-			sizes, sizesWithDPR, DPR, seats, selectedSeats, hoveredSeat, rows, isMouseDown, isMouseMove, selectStart, cursor,
+			sizes, sizesWithDPR, DPR, seats, selectedSeats, hoveredSeat, rows, legend, isMouseDown, isMouseMove, selectStart, cursor,
 		} = this._hallSchemaModel;
 
 		if (!seats.length) return;
@@ -126,6 +126,6 @@ class HallSchemaController {
 		this._hallSchemaView.renderScreen(sizes);
 		this._hallSchemaView.renderSeats(seats, selectedSeats, hoveredSeat, sizes);
 		this._hallSchemaView.renderRows(rows, sizes);
-		this._hallSchemaView.renderLegend(sizes);
+		this._hallSchemaView.renderLegend(sizes, legend);
 	}
 }
