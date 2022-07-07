@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>schema</title>
 </head>
 <body>
     <script type="text/javascript" src="jquery.js"></script>
@@ -21,36 +21,42 @@
         box-shadow: 3px 1px 1px #000;
         fill: #cccccc;
     }
+    .container {
+        max-width: 1200px;
+    }
 </style>
 
-<form action="/" id="change_performance">
+<!-- <form action="/" id="change_performance">
     Загрузка по id расписания
     <input type="text" name="performance" value="">
     <button>Выполнить</button>
-</form>
-<div class="uk-container uk-container-expand">
+</form> -->
+<div class="container">
     <script type="text/javascript">
         $(function() {
-            let params = (new URL(document.location)).searchParams; 
-            let val = params.get('id');
-            if(val !== null) {
-                findSchema(val);
-                $('[name=performance]').val(val);
-            }
+            // let params = (new URL(document.location)).searchParams; 
+            // let val = params.get('id');
+            // if(val !== null) {
+            //     findSchema(val);
+            //     $('[name=performance]').val(val);
+            // }
 
-            $('#change_performance').submit(function(e) {
-                e.preventDefault();
-                val = $(this).serializeArray()[0].value;
-                history.pushState(null, null, '?id='+val);
-                findSchema(val);
-            });
+            // $('#change_performance').submit(function(e) {
+            //     e.preventDefault();
+            //     val = $(this).serializeArray()[0].value;
+            //     history.pushState(null, null, '?id='+val);
+            //     findSchema(val);
+            // });
+
+            findSchema();
+
             $('a').click(function(e) {
                 e.preventDefault();
             });
             $('#showSeats').click(function() {
                 hallSchema._model._extended = true; // Выбор ряда целиком
                 hallSchema._view._names = true; // Отображение номеров мест
-                findSchema(val);
+                findSchema();
             })
         });
 
@@ -120,10 +126,10 @@
         <button data-control="0" uk-icon="minus" uk-tooltip="Уменьшить схему">-</button>
         <button data-control="1" uk-icon="thumbnails" uk-tooltip="Вернуть в исходный вид">=</button>
         <button data-control="2" uk-icon="plus" uk-tooltip="Увеличить схему">+</button>
-        <button id="showSeats">Номера мест</button>
+        <button id="showSeats">Сервисное меню</button>
         <!-- <button id="showLegend">Показать легенду</button> -->
     </div>
-    <div>
+<!--     <div>
         <p>Examples</p>
         <ul>
             <li>61dbebfb37141200011c0c53</li>
@@ -134,7 +140,7 @@
             <li>61dbebe937141200011c0c00</li>
             <li>61dbede137141200011c1445</li>
         </ul>
-    </div>
+    </div> -->
 </div>
 </body>
 </html>
