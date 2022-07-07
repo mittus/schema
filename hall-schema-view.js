@@ -103,6 +103,8 @@ class HallSchemaView {
 
 			/* для двойных мест */
 			if(seat.group_id) {
+				let left = factor == 1.5 ? seat.x + (sizes.seatWidth * .25) : seat.x;
+
 				if(!selectedSeats.has(seat.id) && this._limit && selectedSeats.size >= this._limit - 1 && !seat.occupied) {
 					color = '#cccccc'; // При достижении лимита
 				}
@@ -144,16 +146,16 @@ class HallSchemaView {
 				this._context.beginPath();
 				this._context.arc(left + sizes.seatWidth/2, top-2, 12, 0, Math.PI * 2);
 				this._context.closePath();
-				this._context.fillStyle = seat.color;
+				this._context.fillStyle = shadeColor(seat.color, 80);
 				this._context.fill();
 				this._context.lineWidth = 1;
-				this._context.strokeStyle = shadeColor(seat.color, -20);
+				this._context.strokeStyle = shadeColor(seat.color, -10);
 				this._context.stroke();
 
 
 				this._context.textBaseline = 'top';
 				this._context.textAlign = 'center';
-				this._context.fillStyle = shadeColor(seat.color, -50);
+				this._context.fillStyle = shadeColor(seat.color, -100);
 				this._context.font = '15px sans-serif';
 				this._context.fillText(seat.title, left + sizes.seatWidth/2, top - 8);
 
